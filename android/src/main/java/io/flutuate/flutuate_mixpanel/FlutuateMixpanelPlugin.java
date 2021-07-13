@@ -10,6 +10,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -19,6 +20,8 @@ import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
+import com.mixpanel.android.mpmetrics.SuperPropertyUpdate;
+
 
 public class FlutuateMixpanelPlugin
         implements FlutterPlugin, MethodCallHandler {
@@ -117,6 +120,9 @@ public class FlutuateMixpanelPlugin
             case "timeEvent":
                 timeEvent(call, result);
                 break;
+            case "updateSuperProperties":
+                updateSuperProperties(call, result);
+                break;
             default:
                 result.notImplemented();
                 break;
@@ -196,6 +202,32 @@ public class FlutuateMixpanelPlugin
         }
         mixpanel.registerSuperPropertiesOnce(properties);
         result.success(null);
+    }
+
+    private void updateSuperProperties(MethodCall call, Result result) {
+        Map<String, Object> mapProperties = call.<HashMap<String, Object>>argument("properties");
+        final JSONObject properties;
+        try {
+            properties = extractJSONObject(mapProperties == null ? EMPTY_HASHMAP : mapProperties);
+            SuperPropertyUpdate superPropertyUpdate = new SuperPropertyUpdate() {
+                @Override
+                public JSONObject update(JSONObject oldValues) {
+                    for (Iterator<String> it = properties.keys(); it.hasNext(); ) {
+                        String key = it.next();
+                        try {
+                            oldValues.put(key, properties.get(key));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    return oldValues;
+                }
+            };
+            mixpanel.updateSuperProperties(superPropertyUpdate);
+            result.success(null);
+        } catch (JSONException e) {
+            result.error(e.getClass().getName(), e.toString(), "");
+        }
     }
 
     private void clearSuperProperties(Result result) {

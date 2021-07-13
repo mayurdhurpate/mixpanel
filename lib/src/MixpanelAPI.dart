@@ -82,6 +82,13 @@ class MixpanelAPI {
         'registerSuperProperties', <String, dynamic>{'properties': properties});
   }
 
+
+  // Update Super Properties
+  void updateSuperProperties(Map<String, dynamic> properties) {
+    _channel.invokeMethod<void>('updateSuperProperties',
+        <String, dynamic>{'properties': properties});
+  }
+
   ///
   /// Register Super Properties Once.
   ///

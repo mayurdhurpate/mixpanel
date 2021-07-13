@@ -74,6 +74,7 @@ class _MyAppState extends State<MyApp> {
       buttonGetInstance(context),
       buttonTrackEvent(context),
       buttonRegisterSuperProperties(context),
+      buttonUpdateSuperProperties(context),
       buttonGetDeviceInfo(context),
       buttonGetDistinctId(context),
       buttonReset(context),
@@ -95,6 +96,11 @@ class _MyAppState extends State<MyApp> {
       key: Key('registerSuperProperties'),
       child: Text('Register Super Properties'),
       onPressed: () => registerSuperProperties());
+
+  Widget buttonUpdateSuperProperties(BuildContext context) => ElevatedButton(
+      key: Key('updateSuperProperties'),
+      child: Text('Update Super Properties'),
+      onPressed: () => updateSuperProperties());
 
   Widget buttonReset(BuildContext context) => ElevatedButton(
       key: Key('reset'), child: Text('Reset'), onPressed: () => reset());
@@ -136,6 +142,16 @@ class _MyAppState extends State<MyApp> {
     _mixpanel.registerSuperProperties(properties);
     setState(() {
       _resultMessage = 'Register Super Properties with success!';
+    });
+  }
+
+  void updateSuperProperties() {
+    Map<String, String> properties = {
+      "Plugin": "flutuate_mixpanel_updated",
+    };
+    _mixpanel.updateSuperProperties(properties);
+    setState(() {
+      _resultMessage = 'Updated Super Properties with success!';
     });
   }
 
